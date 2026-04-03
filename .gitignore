@@ -1,0 +1,47 @@
+# Experiment results
+data/runs_organized/
+data/runshistory/
+
+# Scan result logs
+data/skills-*-result/
+
+# Session logs
+sandbox/openclaw/data/agents/main/sessions/
+
+# Sandbox runtime
+sandbox/openclaw/data/memory/
+sandbox/openclaw/data/logs/
+
+# Logs
+*.log
+data/*.log
+
+# Lock files
+data/.*.lock
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Runtime output
+result/
+.runtime/
+
+# Sandbox workspace & backups
+sandbox/openclaw/data/workspace/
+sandbox/openclaw/data/*.bak*
+
+# Temp
+tmp_aig_deploy/
+data/3
+
+# Editor config
+.vscode/
+
+# Environment
+.env
+
+# Upload archives
+*.zip

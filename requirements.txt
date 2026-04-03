@@ -1,0 +1,7 @@
+pyyaml
+pydantic
+openai
+docker
+requests
+pytest
+colorlog

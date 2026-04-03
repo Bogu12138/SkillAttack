@@ -1,0 +1,55 @@
+# Model profiles referenced by configs/stages.yaml.
+# Each stage selects a profile by name via model_profile / target_agent_model_profile.
+# Credentials should be set via environment variables, not hardcoded here.
+profiles:
+  analyzer_model:
+    provider: openai_compatible
+    model: gpt-4o-mini
+    api_key_env: OPENAI_API_KEY
+    base_url_env: OPENAI_BASE_URL
+    timeout_seconds: 300
+    max_retries: 5
+    thinking: false
+    temperature: 0.1
+    max_tokens: 8000
+  attacker_model:
+    provider: openai_compatible
+    model: gpt-4o
+    api_key_env: OPENAI_API_KEY
+    base_url_env: OPENAI_BASE_URL
+    timeout_seconds: 300
+    max_retries: 5
+    thinking: false
+    temperature: 0.9
+    max_tokens: 4000
+  simulator_model:
+    provider: openai_compatible
+    model: gpt-4o-mini
+    api_key_env: OPENAI_API_KEY
+    base_url_env: OPENAI_BASE_URL
+    openclaw_provider_name: openai
+    timeout_seconds: 300
+    max_retries: 5
+    thinking: false
+    temperature: 0.2
+    max_tokens: 4000
+  judge_model:
+    provider: openai_compatible
+    model: gpt-4o-mini
+    api_key_env: OPENAI_API_KEY
+    base_url_env: OPENAI_BASE_URL
+    timeout_seconds: 300
+    max_retries: 5
+    thinking: false
+    temperature: 0.1
+    max_tokens: 8000
+  feedback_model:
+    provider: openai_compatible
+    model: gpt-4o
+    api_key_env: OPENAI_API_KEY
+    base_url_env: OPENAI_BASE_URL
+    timeout_seconds: 300
+    max_retries: 5
+    thinking: false
+    temperature: 0.3
+    max_tokens: 4000

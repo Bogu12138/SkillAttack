@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "deviceId": "REPLACE_WITH_YOUR_DEVICE_ID",
+  "publicKeyPem": "REPLACE_WITH_YOUR_PUBLIC_KEY",
+  "privateKeyPem": "REPLACE_WITH_YOUR_PRIVATE_KEY",
+  "createdAtMs": 1773449057143
+}

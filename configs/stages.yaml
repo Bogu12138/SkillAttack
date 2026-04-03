@@ -1,0 +1,52 @@
+# 端到端流水线的阶段绑定：
+# analyzer -> attacker -> simulator -> judge -> feedback
+analyzer:
+  model_profile: analyzer_model
+  risk_type_remap_model_profile: judge_model
+  risk_type_remap_prompt_path: prompts/analyzer_risk_type_remap.txt
+  api_base_url: http://localhost:18088  # 原生 A.I.G analyzer 使用的本地 webserver 地址
+  language: en # 请求 A.I.G 返回报告时优先使用的语言
+  thread: 4  # 传给 analyzer 的并发 / worker 数提示
+  use_analysis_cache: true  # 有缓存时复用已有的 A.I.G 分析结果
+  force_rescan: false  # true 表示即使已有缓存，也强制重新扫描
+  poll_timeout_seconds: 900    # 等待 A.I.G 任务完成时的轮询配置。
+  poll_interval_seconds: 5
+  fail_open: false   # false 表示 analyzer 失败时直接终止，不回退到兜底分析结果。
+
+attacker:
+  model_profile: attacker_model
+  prompt_path: prompts/attacker_upgraded.txt
+  # 是否混入 seed prompts 来提升攻击多样性
+  seed_enabled: true
+  seed_dir: prompts/attacker_seed
+  seed_max_chars: 6000  # 每次生成时最多加载多少 seed 文本字符
+  retry_max_attempts: 5 # 攻击生成失败或需要更多变体时的最大重试次数
+  max_parallel_sessions: 3 # upgraded attacker 内部允许的最大并发会话数
+  prefer_same_session_retry: true  # 多轮重试时，优先复用同一个 attack session
+  # upgraded attacker 使用的高层阶段划分
+  phase_schedule:
+    - setup
+    - trust
+    - exploit
+
+simulator:
+  target_agent_model_profile: simulator_model
+  container_name: skillrt-openclaw-host
+  isolate_per_run: true  # true 表示每次运行都创建一个新的隔离子容器
+  workspace_seed_dir: data/skillinject/task_files  # 运行前复制到 /root/.openclaw/workspace 的文件目录
+  skills_seed_dir: sandbox/openclaw/data/skills  # 运行前复制到容器内 /root/.openclaw/skills 的 skill 目录
+  session_id: test-session
+  use_attack_session_id: true
+  gateway_port: 18789  # OpenClaw runtime 内部使用的 gateway 端口。
+  allow_runtime_dep_install: false  # 禁止目标执行过程中临时安装依赖。
+  # 在容器内执行的命令模板。
+  # 当前支持占位符：{json_file}、{session_id}、{gateway_port}
+  command_template: "openclaw agent --local --session-id {session_id} --verbose on --message \"$(cat {json_file})\" --json"
+  timeout: 300  # simulator 总命令超时时间，单位秒。
+
+judge:
+  model_profile: judge_model
+  prompt_path: prompts/judge.txt
+
+feedback:
+  model_profile: feedback_model

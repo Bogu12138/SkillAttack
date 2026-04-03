@@ -1,0 +1,46 @@
+# `python main.py` 使用的全局实验默认配置
+common:
+  project:
+    run_root: result/runs_organize/main
+    history_root: result/runshistory  # 新批次开始前，旧运行目录会先迁移到这里
+    log_root: result/log  # 文件日志输出目录
+  input:
+    skills_analysis_result_root: result/aig_cache  # A.I.G 分析结果的缓存目录
+  sandbox:
+    timeout_sec: 180  # 单次运行的 sandbox 超时时间，单位秒
+    cleanup_after_run: true  # 在运行环境支持时，运行结束后清理临时 sandbox 产物
+    network_enabled: true  # 是否允许 sandbox / runtime 访问外网
+    proxy_host: ""  # sandbox 任务可使用的代理配置（按需填写）
+    proxy_port: 7890
+
+# main 模式：对一个skills目录做批量评估。
+main:
+  project:
+    run_root: result/runs_organize/main  # 保存单次运行产物的目录
+    experiment_output_root: result/runs_organize/main/_experiment_results  # 保存批次级汇总结果的目录
+    max_iterations: 3  # 每条 lane（攻击面）最多执行多少轮 attacker -> simulator -> judge
+    surface_parallelism: max  # 每个 skill 同时跑多少个攻击面。可填数字或 "max" ，表示跑几个或者所有推导出的 surface
+    collect_all_surfaces: true  # true：继续覆盖所有 surface，直到各自成功或耗尽轮数。  false：一旦首次验证成功就停止
+  input:
+    raw_skill_root: data/hot100skills  # main 模式下要评测的 skill 根目录
+    task_files_dir: data/skillinject/task_files  # 可选：复制到 OpenClaw workspace 中的种子文件目录
+    task_scripts_dir: data/skillinject/task_scripts  # 可选：复制到 workspace/scripts 中的辅助脚本目录
+    skill_summary: ""  # 可选：按 skill_dir 建索引的 JSON 摘要文件，用于 workspace seed 元数据
+
+# comparison 模式：baseline 与 iterative main 的配对对比实验
+comparison:
+  project:
+    run_root: result/runs_organize/comparison  # comparison 模式下单次运行产物根目录
+    experiment_output_root: result/runs_organize/comparison/_experiment_results  # comparison 模式下批次汇总结果和 CSV 的输出根目录
+    max_cases: 20  # 从选定 split 中最多抽取多少个 prepared case
+    repeats: 1  # 每个 case 重复运行多少次
+    seed: 42  # 用于 case 排序 / 抽样的随机种子
+    main_max_iters: 3  # comparison 中 main 侧最多跑多少轮迭代
+    case_selection: diverse_injection_skill  # "sequential"：按数据集原顺序取 case  # "diverse_injection_skill"：尽量同时覆盖更多 injection id 和 skill
+    surface_mode: per_case_parallel  # "single"：main 试验只跑一个 surface  # "per_case_parallel"：启用基于 lane 的多 surface 运行
+    surface_parallelism: max  # comparison 模式下，每个 main trial 最多推导多少个 surface。
+    shuffle: false  # 构建 paired run plan 前是否打乱 prepared cases
+    resume: false  # comparison 运行支持时，是否从已有 checkpoint 恢复
+  input:
+    pair_root: data/skillinject  # prepared SkillInject 数据集根目录
+    split: obvious  # prepared split 名称。目前支持：obvious、contextual

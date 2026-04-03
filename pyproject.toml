@@ -1,0 +1,21 @@
+[project]
+name = "agent-skill-redteam"
+version = "1.0.0"
+description = "Automated Red Team Pipeline for Agent Skills"
+authors = [
+    {name = "Zenghao Duan"},
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml",
+    "pydantic",
+    "openai",
+    "docker",
+    "requests",
+    "pytest",
+    "colorlog"
+]
+
+[project.scripts]
+agent-redteam = "main:main"
