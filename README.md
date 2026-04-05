@@ -4,7 +4,8 @@
   **Automated red teaming of agent skills through attack path refinement.**
 
   <a href="skillattack_paper.pdf"><img src="https://img.shields.io/badge/📄_Paper-PDF-b31b1b" /></a>&nbsp;
-  <a href="https://YOUR_USERNAME.github.io/SkillAttack"><img src="https://img.shields.io/badge/🌐_Showcase-Live_Demo-blue" /></a>&nbsp;
+  <a href="https://Zhow01.github.io/SkillAttack"><img src="https://img.shields.io/badge/🌐_Showcase-Live_Demo-blue" /></a>&nbsp;
+  <a href="https://skillatlas.org"><img src="https://img.shields.io/badge/🔍_SkillAtlas-Attack_Traces-purple" /></a>&nbsp;
   <a href="#quick-start"><img src="https://img.shields.io/badge/🚀_Quick_Start-Guide-2ea44f" /></a>&nbsp;
   <a href="#citation"><img src="https://img.shields.io/badge/📝_Citation-BibTeX-orange" /></a>
 
@@ -13,19 +14,22 @@
 
 ## Why SkillAttack
 
-As general-purpose agent platforms like OpenClaw adopt **skills** as a core extension mechanism, poorly designed, misconfigured, or malicious skills can directly introduce risks into the agent's execution chain.
+As agent platforms like OpenClaw adopt **skills** as their core extension mechanism, every skill installed becomes part of the agent's execution chain and a potential attack surface.
 
-The current community largely relies on **manual skill review** or **system-level restrictions** (sandboxing, allowlists) to mitigate these risks. Both approaches have fundamental limitations:
+Existing defenses face a fundamental tension: hardening individual skills doesn't scale, while system-level restrictions sacrifice the extensibility that makes skills useful.
 
-- **Manual review** doesn't scale and misses adversarial edge cases that only surface during execution.
-- **System-level restrictions** reduce risk but sacrifice extensibility, often blocking legitimate capabilities alongside dangerous ones.
-
-SkillAttack takes a third path: **automated, evidence-based red teaming**. Rather than guessing what might go wrong, it discovers attack surfaces, generates adversarial prompts, executes them in real sandboxes, judges outcomes from actual execution artifacts, and feeds evidence back into the next attack round. The result is a reproducible vulnerability report grounded in what the agent *actually did*, not what we *assumed* it would do.
+SkillAttack provides **automated red teaming** that discovers what actually goes wrong when an agent executes a skill under adversarial conditions, without modifying the skill or the platform. **Combined with [skillatlas.org](https://skillatlas.org), a community-driven attack trace library, every attack path discovered by any contributor becomes a shared defense for the entire ecosystem.**
 
 
 ## Overview
 
-SkillAttack is the first red-teaming framework that dynamically verifies skill vulnerability exploitability through adversarial prompting, without modifying the skill itself. It operates as a three-stage closed-loop pipeline: **(1) Skill Vulnerability Analysis** identifies attack surfaces from the skill's code and instructions; **(2) Surface-Parallel Attack Generation** constructs adversarial prompts across multiple surfaces simultaneously; **(3) Feedback-Driven Exploit Refinement** executes prompts in sandboxed agents, judges outcomes from real artifacts, and refines attack paths based on execution feedback.
+SkillAttack verifies whether skill vulnerabilities are actually exploitable through adversarial prompting, without modifying the skill itself. It operates as a closed-loop pipeline with three stages:
+
+1. **Skill Vulnerability Analysis**: identifies attack surfaces from the skill's code and instructions.
+2. **Surface-Parallel Attack Generation**: constructs adversarial prompts targeting multiple surfaces simultaneously.
+3. **Feedback-Driven Exploit Refinement**: executes prompts in sandboxed agents, judges outcomes from real execution artifacts, and iteratively refines attack paths based on feedback.
+
+For detailed attack traces and case studies, visit the [showcase](https://Zhow01.github.io/SkillAttack).
 
 <div align="center">
   <img src="assets/overall.png" alt="SkillAttack overview" width="850" />
@@ -37,7 +41,7 @@ SkillAttack is the first red-teaming framework that dynamically verifies skill v
 **Requirements:** Python 3.10+, Docker, an OpenAI-compatible model endpoint.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/SkillAttack.git
+git clone https://github.com/Zhow01/SkillAttack.git
 cd SkillAttack
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
@@ -55,60 +59,95 @@ chmod +x quickstart.sh
 The script handles dependency sync, A.I.G analyzer startup, sandbox setup, and experiment execution.
 
 
-## Usage
+## Usage & Community
+
+### Run experiments
 
 ```bash
-# Main experiment — run all skills
-python main.py main
-python main.py main --collect-all-surfaces    # test all surfaces, don't stop early
-
-# Single skill
-python scripts/run_single_skill_test.py 001_pskoett_self-improving-agent
-
-# Multi-model — same skill across different LLMs
-python scripts/run_multi_model_test.py 001_pskoett_self-improving-agent
-
-# Batch — all skills with cached analyzer results
-python scripts/run_all_cached_skills.py --model all
-
-# Comparison — SkillInject baseline
-python main.py compare --split obvious --max-cases 20 --repeats 1
+python main.py main                           # red-team all skills
+python main.py main --collect-all-surfaces    # cover every attack surface
+python main.py compare --split obvious        # SkillInject baseline comparison
 ```
 
+Two datasets are included: **SkillInject** (`data/skillinject/`, 71 adversarial skills) and **Hot100** (`data/hot100skills/`, top 100 skills from [ClawHub](https://clawhub.ai)). You can also evaluate any custom skill directory containing a `SKILL.md` by setting `main.input.raw_skill_root` in `experiment.yaml`.
 
-## Configuration
+### Configuration
 
-All settings live in three YAML files under `configs/`:
+All settings live under `configs/`:
 
-- **`experiment.yaml`** — experiment parameters: skill directories, iteration budget, parallelism, output paths.
-- **`models.yaml`** — named model profiles (provider, endpoint, temperature) referenced by each stage.
-- **`stages.yaml`** — binds each pipeline stage (analyzer, attacker, simulator, judge, feedback) to its model profile, prompt, and runtime parameters.
+| File | What it controls |
+|------|-----------------|
+| `experiment.yaml` | Skill directories, iteration budget, surface parallelism, output paths |
+| `models.yaml` | Model profiles (provider, endpoint, temperature) for each pipeline stage |
+| `stages.yaml` | Binds each stage (analyzer, attacker, simulator, judge, feedback) to its model profile and prompt |
 
-Model credentials should be set via `.env`, not committed to YAML files.
+Model credentials are read from environment variables. Copy `.env.example` to `.env` and fill in your keys:
 
-
-## Datasets
-
-- **SkillInject** (`data/skillinject/`) — 71 adversarial skills in two splits: `obvious/` (explicit injections) and `contextual/` (dual-use instructions).
-- **Hot100** (`data/hot100skills/`) — the 100 most popular skills from ClawHub. Download via `python scripts/download_clawhub_hot100.py`.
-- **Custom** — place a directory with `SKILL.md` anywhere and set `main.raw_skill_root` in `experiment.yaml`.
-
-
-## Result Structure
-
-```
-result/
-├── runs_organize/
-│   └── main/<skill_id>/
-│       ├── model.json                     # which models ran each stage
-│       ├── <skill_id>_analyze.json        # surfaces found
-│       ├── surface_01_<name>/round_*.json # per-round evidence chain
-│       └── <skill_id>_global_report.json  # per-skill summary
-├── log/
-└── aig_cache/                             # cached A.I.G analyzer results
+```bash
+cp .env.example .env
+# Edit .env: set OPENAI_API_KEY, OPENAI_BASE_URL, etc.
 ```
 
-Each `round_*.json` contains the attack prompt, simulation trace, judge verdict, and feedback.
+### Project structure
+
+```
+SkillAttack/
+├── main.py                  # unified CLI entry point
+├── quickstart.sh            # one-command setup + smoke test
+├── configs/                 # experiment, model, and stage configs
+├── core/                    # pipeline orchestration, schemas, LLM routing
+├── stages/                  # analyzer, attacker, simulator, judge, feedback
+├── experiments/             # main_run and compare_run orchestration
+├── prompts/                 # LLM prompt templates and attacker seeds
+├── data/skillinject/        # SkillInject adversarial dataset
+├── data/hot100skills/       # ClawHub top 100 skills
+├── sandbox/                 # OpenClaw container config and Dockerfile
+├── scripts/                 # upload, download, summarize utilities
+└── result/                  # experiment outputs (gitignored)
+```
+
+Results are written to `result/runs_organize/{model_name}/{skill_id}/` and include analysis reports, per-round attack traces, and global summaries.
+
+### ❗ Share your results
+
+> We strongly encourage you to upload your results after each experiment. The more attack paths the community shares, the stronger our collective defense becomes.
+
+**Option 1: Command line** (recommended)
+
+```bash
+python scripts/upload_results.py result/runs_organize
+```
+
+**Option 2: Web upload**
+
+Zip the `result/runs_organize` directory and upload it at **[skillatlas.org/submit](https://skillatlas.org/submit)**.
+
+Both options return a submission ID for tracking:
+
+```bash
+python scripts/upload_results.py --check <submissionId>
+```
+
+Browse all community-contributed attack traces at **[skillatlas.org](https://skillatlas.org)**.
+
+
+
+
+
+
+## Acknowledgements
+
+The vulnerability analysis stage of SkillAttack is powered by **[A.I.G (AI-Infra-Guard)](https://github.com/Tencent/AI-Infra-Guard)**, an open-source AI red teaming platform by Tencent Zhuque Lab. A.I.G provides automated security scanning for MCP Servers, Agent Skills, and AI infrastructure. SkillAttack integrates its `mcp_scan` capability to identify attack surfaces from skill source code before generating adversarial prompts.
+
+
+## Contributors
+
+<a href="https://github.com/ISAQQSAI"><img src="https://github.com/ISAQQSAI.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/GioldDiorld"><img src="https://github.com/GioldDiorld.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/Dranvin"><img src="https://github.com/Dranvin.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/xiangyuf896-cyber"><img src="https://github.com/xiangyuf896-cyber.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/DJC-GO-SOLO"><img src="https://github.com/DJC-GO-SOLO.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/Hi-archers"><img src="https://github.com/Hi-archers.png" width="60" style="border-radius:50%" /></a>
 
 
 ## Citation
@@ -116,13 +155,8 @@ Each `round_*.json` contains the attack prompt, simulation trace, judge verdict,
 ```bibtex
 @article{duan2026skillattack,
   title     = {SkillAttack: Automated Red Teaming of Agent Skills through Attack Path Refinement},
-  author    = {Zenghao Duan and Yuxin Tian and Liang Pang and Jingcheng Deng and Zihao Wei and Shicheng Xu and Yuyao Ge and Wenbin Duan and Zhiyi Yin and Xueqi Cheng},
+  author    = {Zenghao Duan and Yuxin Tian and Zhiyi Yin and Jingcheng Deng and Zihao Wei and Shicheng Xu and Yuyao Ge and Liang Pang and Xueqi Cheng},
   journal   = {arXiv preprint arXiv:xxxx.xxxxx},
   year      = {2026}
 }
 ```
-
-
-## License
-
-[MIT](LICENSE)
