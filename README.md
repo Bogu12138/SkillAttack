@@ -3,7 +3,7 @@
 
   **Automated red teaming of agent skills through attack path refinement.**
 
-  <a href="skillattack_paper.pdf"><img src="https://img.shields.io/badge/📄_Paper-PDF-b31b1b" /></a>&nbsp;
+  <a href="https://arxiv.org/abs/2604.04989"><img src="https://img.shields.io/badge/📄_Paper-arXiv-b31b1b" /></a>&nbsp;
   <a href="https://Zhow01.github.io/SkillAttack"><img src="https://img.shields.io/badge/🌐_Showcase-Live_Demo-blue" /></a>&nbsp;
   <a href="https://skillatlas.org"><img src="https://img.shields.io/badge/🔍_SkillAtlas-Attack_Traces-purple" /></a>&nbsp;
   <a href="#quick-start"><img src="https://img.shields.io/badge/🚀_Quick_Start-Guide-2ea44f" /></a>&nbsp;
@@ -143,20 +143,23 @@ The vulnerability analysis stage of SkillAttack is powered by **[A.I.G (AI-Infra
 ## Contributors
 
 <a href="https://github.com/ISAQQSAI"><img src="https://github.com/ISAQQSAI.png" width="60" style="border-radius:50%" /></a>
-<a href="https://github.com/GioldDiorld"><img src="https://github.com/GioldDiorld.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/YuyaoGe"><img src="https://github.com/YuyaoGe.png" width="60" style="border-radius:50%" /></a>
 <a href="https://github.com/Dranvin"><img src="https://github.com/Dranvin.png" width="60" style="border-radius:50%" /></a>
 <a href="https://github.com/xiangyuf896-cyber"><img src="https://github.com/xiangyuf896-cyber.png" width="60" style="border-radius:50%" /></a>
 <a href="https://github.com/DJC-GO-SOLO"><img src="https://github.com/DJC-GO-SOLO.png" width="60" style="border-radius:50%" /></a>
 <a href="https://github.com/Hi-archers"><img src="https://github.com/Hi-archers.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/pl8787"><img src="https://github.com/pl8787.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/lin1127000"><img src="https://github.com/lin1127000.png" width="60" style="border-radius:50%" /></a>
+<a href="https://github.com/yaolingling1004"><img src="https://github.com/yaolingling1004.png" width="60" style="border-radius:50%" /></a>
 
 
 ## Citation
 
 ```bibtex
 @article{duan2026skillattack,
-  title     = {SkillAttack: Automated Red Teaming of Agent Skills through Attack Path Refinement},
-  author    = {Zenghao Duan and Yuxin Tian and Zhiyi Yin and Jingcheng Deng and Zihao Wei and Shicheng Xu and Yuyao Ge and Liang Pang and Xueqi Cheng},
-  journal   = {arXiv preprint arXiv:xxxx.xxxxx},
-  year      = {2026}
+  title={SkillAttack: Automated Red Teaming of Agent Skills through Attack Path Refinement},
+  author={Duan, Zenghao and Tian, Yuxin and Yin, Zhiyi and Pang, Liang and Deng, Jingcheng and Wei, Zihao and Xu, Shicheng and Ge, Yuyao and Cheng, Xueqi},
+  journal={arXiv preprint arXiv:2604.04989},
+  year={2026}
 }
 ```
