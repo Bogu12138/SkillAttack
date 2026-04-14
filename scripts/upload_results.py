@@ -20,8 +20,8 @@ from typing import Any, Dict, List
 import requests
 
 ROOT = Path(__file__).resolve().parents[1]
-UPLOAD_URL = "https://skillatlas.org/api/uploads"
-SUBMISSIONS_URL = "https://skillatlas.org/api/submissions"
+UPLOAD_URL = "https://skillatlas.top/api/uploads"
+SUBMISSIONS_URL = "https://skillatlas.top/api/submissions"
 KEYS_FILE = ROOT / "result" / ".upload_keys.json"
 MAX_UPLOAD_SIZE_MB = 25
 

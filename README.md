@@ -5,7 +5,7 @@
 
   <a href="https://arxiv.org/abs/2604.04989"><img src="https://img.shields.io/badge/📄_Paper-arXiv-b31b1b" /></a>&nbsp;
   <a href="https://Zhow01.github.io/SkillAttack"><img src="https://img.shields.io/badge/🌐_Showcase-Live_Demo-blue" /></a>&nbsp;
-  <a href="https://skillatlas.org"><img src="https://img.shields.io/badge/🔍_SkillAtlas-Attack_Traces-purple" /></a>&nbsp;
+  <a href="https://skillatlas.top/home"><img src="https://img.shields.io/badge/🔍_SkillAtlas-Attack_Traces-purple" /></a>&nbsp;
   <a href="#quick-start"><img src="https://img.shields.io/badge/🚀_Quick_Start-Guide-2ea44f" /></a>&nbsp;
   <a href="#citation"><img src="https://img.shields.io/badge/📝_Citation-BibTeX-orange" /></a>
 
@@ -18,7 +18,7 @@ As agent platforms like OpenClaw adopt **skills** as their core extension mechan
 
 Existing defenses face a fundamental tension: hardening individual skills doesn't scale, while system-level restrictions sacrifice the extensibility that makes skills useful.
 
-SkillAttack provides **automated red teaming** that discovers what actually goes wrong when an agent executes a skill under adversarial conditions, without modifying the skill or the platform. **Combined with [skillatlas.org](https://skillatlas.org), a community-driven attack trace library, every attack path discovered by any contributor becomes a shared defense for the entire ecosystem.**
+SkillAttack provides **automated red teaming** that discovers what actually goes wrong when an agent executes a skill under adversarial conditions, without modifying the skill or the platform. **Combined with [skillatlas.top](https://skillatlas.top/home), a community-driven attack trace library, every attack path discovered by any contributor becomes a shared defense for the entire ecosystem.**
 
 
 ## Overview
@@ -120,7 +120,7 @@ python scripts/upload_results.py result/runs_organize
 
 **Option 2: Web upload**
 
-Zip the `result/runs_organize` directory and upload it at **[skillatlas.org/submit](https://skillatlas.org/submit)**.
+Zip the `result/runs_organize` directory and upload it at **[skillatlas.top/submit](https://skillatlas.top/submit)**.
 
 Both options return a submission ID for tracking:
 
@@ -128,7 +128,7 @@ Both options return a submission ID for tracking:
 python scripts/upload_results.py --check <submissionId>
 ```
 
-Browse all community-contributed attack traces at **[skillatlas.org](https://skillatlas.org)**.
+Browse all community-contributed attack traces at **[skillatlas.top](https://skillatlas.top/home)**.
 
 
 
