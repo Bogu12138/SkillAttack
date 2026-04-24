@@ -7,11 +7,14 @@ VENV_DIR="${ROOT_DIR}/.venv"
 
 DEFAULT_AIG_PORT="18088"
 DEFAULT_AIG_CONTAINER="skillattack-aig-webserver"
+DEFAULT_AIG_AGENT_CONTAINER="skillattack-aig-agent"
 DEFAULT_AIG_SERVER_IMAGE="docker.1ms.run/zhuquelab/aig-server:latest"
 DEFAULT_AIG_AGENT_IMAGE="docker.1ms.run/zhuquelab/aig-agent:latest"
 DEFAULT_OPENCLAW_CONTAINER="skillrt-openclaw-host"
 
 AIG_CONTAINER=""
+AIG_AGENT_CONTAINER=""
+AIG_AGENT_SERVER=""
 AIG_PORT=""
 AIG_SERVER_IMAGE=""
 AIG_AGENT_IMAGE=""
@@ -48,7 +51,9 @@ coerce_positive_int() {
 
 refresh_runtime_config() {
   AIG_CONTAINER="${AIG_CONTAINER:-${DEFAULT_AIG_CONTAINER}}"
+  AIG_AGENT_CONTAINER="${AIG_AGENT_CONTAINER:-${DEFAULT_AIG_AGENT_CONTAINER}}"
   AIG_PORT="${AIG_PORT:-${DEFAULT_AIG_PORT}}"
+  AIG_AGENT_SERVER="${AIG_AGENT_SERVER:-host.docker.internal:${AIG_PORT}}"
   AIG_SERVER_IMAGE="${AIG_SERVER_IMAGE:-${DEFAULT_AIG_SERVER_IMAGE}}"
   AIG_AGENT_IMAGE="${AIG_AGENT_IMAGE:-${DEFAULT_AIG_AGENT_IMAGE}}"
   AIG_STARTUP_TIMEOUT_SEC="$(coerce_positive_int "${AIG_STARTUP_TIMEOUT_SEC:-60}" 60)"
@@ -306,6 +311,54 @@ ensure_aig_webserver() {
   fi
 }
 
+create_aig_agent() {
+  log "Creating local AIG worker: ${AIG_AGENT_CONTAINER}"
+  docker run -d \
+    --name "${AIG_AGENT_CONTAINER}" \
+    --restart unless-stopped \
+    --add-host host.docker.internal:host-gateway \
+    "${AIG_AGENT_IMAGE}" \
+    -server "${AIG_AGENT_SERVER}" >/dev/null
+}
+
+wait_for_aig_agent() {
+  local elapsed=0
+  local status=""
+  local logs=""
+
+  while (( elapsed < AIG_STARTUP_TIMEOUT_SEC )); do
+    status="$(docker inspect -f '{{.State.Status}}' "${AIG_AGENT_CONTAINER}" 2>/dev/null || true)"
+    if [[ "${status}" == "running" ]]; then
+      logs="$(docker logs --tail=120 "${AIG_AGENT_CONTAINER}" 2>&1 || true)"
+      if grep -Eq 'register_ack|wait task|Received ping message' <<<"${logs}"; then
+        return 0
+      fi
+    fi
+    sleep "${AIG_STARTUP_INTERVAL_SEC}"
+    elapsed=$((elapsed + AIG_STARTUP_INTERVAL_SEC))
+  done
+
+  return 1
+}
+
+ensure_aig_agent() {
+  if docker ps -a --format '{{.Names}}' | grep -qx "${AIG_AGENT_CONTAINER}"; then
+    if docker ps --format '{{.Names}}' | grep -qx "${AIG_AGENT_CONTAINER}"; then
+      log "Reusing existing AIG worker: ${AIG_AGENT_CONTAINER}"
+    else
+      log "Starting existing AIG worker: ${AIG_AGENT_CONTAINER}"
+      docker start "${AIG_AGENT_CONTAINER}" >/dev/null
+    fi
+  else
+    create_aig_agent
+  fi
+
+  if ! wait_for_aig_agent; then
+    docker logs --tail=80 "${AIG_AGENT_CONTAINER}" >&2 || true
+    die "AIG worker failed to register with ${AIG_AGENT_SERVER}"
+  fi
+}
+
 ensure_openclaw_host() {
   if docker ps --format '{{.Names}}' | grep -qx "${OPENCLAW_CONTAINER}"; then
     return
@@ -403,6 +456,7 @@ main() {
   setup_venv
   ensure_aig_webserver
   ensure_openclaw_host
+  ensure_aig_agent
 
   case "${MODE}" in
     smoke)

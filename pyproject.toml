@@ -17,5 +17,28 @@ dependencies = [
     "colorlog"
 ]
 
+[tool.setuptools]
+py-modules = ["main"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "core*",
+    "experiments*",
+    "sandbox*",
+    "scripts*",
+    "stages*",
+]
+exclude = [
+    "assets*",
+    "configs*",
+    "data*",
+    "docker*",
+    "prompts*",
+    "showcase*",
+    "tests*",
+]
+namespaces = true
+
 [project.scripts]
 agent-redteam = "main:main"
