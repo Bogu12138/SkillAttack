@@ -89,7 +89,7 @@ ensure_env_file() {
   fi
 
   cp "${ROOT_DIR}/.env.example" "${ROOT_DIR}/.env"
-  die "Created ${ROOT_DIR}/.env. Fill in QWEN_API_KEY and rerun."
+  die "Created ${ROOT_DIR}/.env. Fill in OPENAI_API_KEY and rerun."
 }
 
 requirements_fingerprint() {
@@ -141,8 +141,8 @@ load_env() {
   source "${ROOT_DIR}/.env"
   set +a
 
-  [[ -n "${QWEN_API_KEY:-}" ]] || die "QWEN_API_KEY is missing in ${ROOT_DIR}/.env"
-  [[ -n "${QWEN_BASE_URL:-}" ]] || die "QWEN_BASE_URL is missing in ${ROOT_DIR}/.env"
+  [[ -n "${OPENAI_API_KEY:-}" ]] || die "OPENAI_API_KEY is missing in ${ROOT_DIR}/.env"
+  [[ -n "${OPENAI_BASE_URL:-}" ]] || die "OPENAI_BASE_URL is missing in ${ROOT_DIR}/.env"
 }
 
 verify_model_access() {
@@ -152,8 +152,8 @@ import os
 import sys
 import urllib.request
 
-base_url = (os.environ.get("QWEN_BASE_URL") or "").strip().rstrip("/")
-api_key = (os.environ.get("QWEN_API_KEY") or "").strip()
+base_url = (os.environ.get("OPENAI_BASE_URL") or "").strip().rstrip("/")
+api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
 url = f"{base_url}/models"
 req = urllib.request.Request(url, headers={"Authorization": f"Bearer {api_key}"})
 
